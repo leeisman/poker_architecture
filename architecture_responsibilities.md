@@ -16,7 +16,7 @@ room_server 為遊戲中介與調度層，專責處理玩家進出桌、金流�
 | 💰 金流處理      | 負責處理 `rebuyREQ`、`addonREQ` 等指令，透過 ValueServer 完成金流交易 |
 | 🧭 玩家調度      | 管理 `enterRoomREQ` / `leaveRoomREQ`，負責資金鎖定、轉帳與進出紀錄 |
 | 🪑 配桌管理      | 控制建桌邏輯（含 least_conn），並將玩家分配至適當 table_server |
-| 🧾 狀態同步快取  | 從 game_record_server/Mongo 讀取並快取玩家當前遊戲狀態 |
+| 🧾 狀態同步快取  | 從 Mongo 讀取牌桌當前狀態，例如晉桌人數等等 |
 | 🔁 MTT 賽制控制  | 控制 MTT 桌次生成、淘汰者處理、合桌、進度同步等流程 |
 | 🏁 結算發獎      | 統整名次與獎金分配，調用金流服務完成最終發獎 |
 
