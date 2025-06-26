@@ -1,6 +1,6 @@
-# 🎯 TableServer 心跳監控與災難復原流程
+# 🎯 table_server 心跳監控與災難復原流程
 
-本文件描述 TableServer 的狀態維護機制，包含定期回報存活資訊、RoomServer 的健康檢查，以及當 Table 異常掉線時的災難自動恢復機制。此設計確保每張桌子在高可用場景下皆具備自我修復能力。
+本文件描述 table_server 的狀態維護機制，包含定期回報存活資訊、room_server 的健康檢查，以及當 Table 異常掉線時的災難自動恢復機制。此設計確保每張桌子在高可用場景下皆具備自我修復能力。
 
 ---
 
@@ -8,10 +8,10 @@
 
 ```mermaid
 sequenceDiagram
-    participant Table as TableServer
+    participant Table as table_server
     participant Redis as Redis
-    participant Room as RoomServer
-    participant NewTable as Recovery TableServer
+    participant Room as room_server
+    participant NewTable as Recovery table_server
 
     Note over Table: 每分鐘進行一次心跳回報
 

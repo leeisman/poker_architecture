@@ -3,12 +3,12 @@
 
 ```mermaid
 sequenceDiagram
-    participant Room as RoomServer
+    participant Room as room_server
     participant Mongo as MongoDB
-    participant Table1 as TableServer1
-    participant Table2 as TableServer2
+    participant Table1 as table_server_1
+    participant Table2 as table_server_2
 
     Room->>Mongo: aggregate table_server_id + conn_count
-    Mongo-->>Room: 回傳 TableServer1:2, TableServer2:5
+    Mongo-->>Room: 回傳 table_server_1:2, table_server_2:5
     Room->>Table1: 建立新桌子 table_abc
 ```

@@ -7,12 +7,12 @@
 ## 🎯 流程特性
 
 - 📝 賽事尚未開始時，玩家報名資料僅寫入 MongoDB
-- 🕒 比賽開始時間一到，由 RoomServer 自動建立 TableServer 並將玩家分配入桌
-- 🧾 TableServer 會主動推送 `enterRoomRSP` 指令讓玩家進桌
-- 🔁 當桌子人數過少，RoomServer 自動觸發合桌遷移（Table Migration）
-- 💥 玩家輸光籌碼後，TableServer 會通知 GameRecordService 更新遊戲狀態
+- 🕒 比賽開始時間一到，由 room_server 自動建立 table_server 並將玩家分配入桌
+- 🧾 table_server 會主動推送 `enterRoomRSP` 指令讓玩家進桌
+- 🔁 當桌子人數過少，room_server 自動觸發合桌遷移（Table Migration）
+- 💥 玩家輸光籌碼後，table_server 會通知 GameRecordService 更新遊戲狀態
 - 📋 玩家可透過 `tableInfoREQ` 查詢目前桌子狀況
-- 🏁 最終由 RoomServer 統一整理名次與獎勵分配
+- 🏁 最終由 room_server 統一整理名次與獎勵分配
 
 ---
 
@@ -23,8 +23,8 @@ sequenceDiagram
     participant Client as 玩家 Client
     participant Gateway as Game Gateway
     participant GameRouter as GameRouter (快取路由)
-    participant Room as RoomServer (錦標賽管理)
-    participant Table as TableServer (遊戲進行)
+    participant Room as room_server (錦標賽管理)
+    participant Table as table_server (遊戲進行)
     participant Record as GameRecordService
     participant Mongo as MongoDB
 
@@ -35,7 +35,7 @@ sequenceDiagram
     Room->>Mongo: Insert tournament_enroll(uid, tourney_id)
     Room-->>Client: joinRSP(success)
 
-    %% 2. 比賽開始，由 RoomServer 配桌
+    %% 2. 比賽開始，由 room_server 配桌
     Note over Room: 比賽時間觸發配桌
     Room->>Mongo: 查詢 tournament_enroll 名單
     loop 每 9 人配一桌
@@ -54,7 +54,7 @@ sequenceDiagram
     Table->>Record: UpdatePlayerState(uid, status="out")
     Record->>Mongo: Update playing_room_status / tournament_state
 
-    %% 5. 單桌結果回傳給 RoomServer
+    %% 5. 單桌結果回傳給 room_server
     Table-->>Room: TableResult(table_id, chip_diff)
     Room->>Mongo: Update tournament_state
 
@@ -83,9 +83,9 @@ sequenceDiagram
 ## 🔁 桌子合併細節流程（TableA → TableB）
 ```mermaid
 sequenceDiagram
-    participant Room as RoomServer
-    participant TableA as TableServer A
-    participant TableB as TableServer B
+    participant Room as room_server
+    participant TableA as table_server A
+    participant TableB as table_server B
     participant Redis as Redis (可選)
     participant Mongo as MongoDB
 

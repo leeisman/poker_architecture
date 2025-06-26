@@ -6,7 +6,7 @@
 
 ```mermaid
 sequenceDiagram
-    participant Table as TableServer
+    participant Table as table_server
     participant Record as GameRecordService
     participant Mongo as MongoDB
     participant Client as 玩家 Client

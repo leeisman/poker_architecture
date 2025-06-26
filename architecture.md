@@ -10,20 +10,20 @@ subgraph Gateway [Game Gateway]
 end
 
 subgraph Router [Router 層]
-    RR["GameRouter<br/>(指令路由 + 快取轉發)"]
+    RR["game_router<br/>(指令路由 + 快取轉發)"]
 end
 
-subgraph RoomServer [RoomServer 層]
-    RS1["RoomServer - Ring<br/>房間管理"]
-    RS2["RoomServer - MTT<br/>錦標賽控管"]
+subgraph room_server [room_server 層]
+    RS1["room_server - Ring<br/>房間管理"]
+    RS2["room_server - MTT<br/>錦標賽控管"]
 end
 
-subgraph TableServer [TableServer 層]
-    T1["TableService<br/>發牌 + 結算 + 狀態"]
+subgraph table_server [table_server 層]
+    T1["table_server<br/>發牌 + 結算 + 狀態"]
 end
 
-subgraph GameRecordService [GameRecord Service]
-    GR["GameRecordService<br/>(遊戲記錄寫入)"]
+subgraph game_record_server [game_rocer_server ]
+    GR["game_record_server<br/>(遊戲記錄寫入)"]
 end
 
 subgraph Storage [Storage]
@@ -34,23 +34,23 @@ end
 %% 玩家進入房間
 C1 -->|EnterRoomREQ| GW
 GW -->|EnterRoomREQ| RR
-RR -->|EnterRoomREQ→RoomServer| RS1
+RR -->|EnterRoomREQ→room_server| RS1
 RS1 -->|iSitDownREQ| T1
 
 %% 遊戲進行中的請求
 C1 -->|BetREQ| GW
 GW -->|BetREQ| RR
-RR -->|BetREQ→TableServer| T1
+RR -->|BetREQ→table_server| T1
 
-%% TableServer 狀態更新
+%% table_server 狀態更新
 T1 -->|狀態更新| REDIS
 T1 -->|定期心跳| REDIS
 
-%% 資料寫入由 GameRecordService 處理
+%% 資料寫入由 game_record_server 處理
 T1 -->|HandEndREQ| GR
 GR --> DB
 
-%% RoomServer 健康檢查
+%% room_server 健康檢查
 RS1 -->|心跳檢查 table_alive| REDIS
 
 %% 顏色樣式

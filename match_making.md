@@ -1,6 +1,6 @@
 # Matchmaking 自動配桌流程
 
-當玩家進入房間（EnterRoomREQ）後，RoomServer 將根據當前桌子使用狀況、自訂條件（如 VIP、盲注等）進行自動配桌。此流程在 Ring Game 中尤為關鍵，可確保桌子資源最佳化使用並減少等待時間。
+當玩家進入房間（EnterRoomREQ）後，room_server 將根據當前桌子使用狀況、自訂條件（如 VIP、盲注等）進行自動配桌。此流程在 Ring Game 中尤為關鍵，可確保桌子資源最佳化使用並減少等待時間。
 
 ---
 
@@ -18,9 +18,9 @@
 sequenceDiagram
     participant Client as 玩家 Client
     participant Gateway as Game Gateway
-    participant Router as GameRouter（指令路由）
-    participant Room as RoomServer（房間管理）
-    participant Table as TableServer（遊戲邏輯）
+    participant Router as game_router（指令路由）
+    participant Room as room_server（房間管理）
+    participant Table as table_server（遊戲邏輯）
     participant DB as MongoDB（playing_room_status）
 
     Client->>Gateway: EnterRoomREQ

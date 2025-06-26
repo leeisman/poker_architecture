@@ -1,6 +1,6 @@
 # 🔁 Table Migration 桌子遷移流程設計
 
-當進行 **滾動部署** 或遇到 TableServer 發生異常時，RoomServer 需主動觸發桌子遷移機制，以確保遊戲不中斷並支援狀態復原。以下為完整的流程與設計說明。
+當進行 **滾動部署** 或遇到 table_server 發生異常時，room_server 需主動觸發桌子遷移機制，以確保遊戲不中斷並支援狀態復原。以下為完整的流程與設計說明。
 
 ---
 
@@ -17,26 +17,26 @@
 
 ```mermaid
 sequenceDiagram
-    participant Room as RoomServer
-    participant OldTable as 舊 TableServer
+    participant Room as room_server
+    participant OldTable as 舊 table_server
     participant Redis as Redis
-    participant NewTable as 新 TableServer
+    participant NewTable as 新 table_server
     participant GameRouter as GameRouter (指令快取路由)
 
     %% Step 1: 偵測需遷移桌子
     Room->>OldTable: HealthCheck / 停止接收新請求
 
-    %% Step 2: 舊 TableServer 將狀態寫入 Redis
+    %% Step 2: 舊 table_server 將狀態寫入 Redis
     OldTable->>Redis: SET table_state:table_123 = {...} EX 300
 
-    %% Step 3: 舊 TableServer 仍接收指令，寫入 queue
+    %% Step 3: 舊 table_server 仍接收指令，寫入 queue
     Note over OldTable: 將指令寫入 Redis queue
     OldTable->>Redis: LPUSH table_queue:table_123 BetREQ(...)
 
-    %% Step 4: 啟動新 TableServer 做復原
+    %% Step 4: 啟動新 table_server 做復原
     Room->>NewTable: recovery_table(table_123)
 
-    %% Step 5: 新 TableServer 載入狀態
+    %% Step 5: 新 table_server 載入狀態
     NewTable->>Redis: GET table_state:table_123
 
     %% Step 6: 宣告上線 + 更新心跳

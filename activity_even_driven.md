@@ -15,7 +15,7 @@
 ## 架構圖
 ```mermaid
 flowchart TD
-    A[TableServer] -->|打牌事件| B(GameRecordServer)
+    A[table_server] -->|打牌事件| B(game_record_server)
     B -->|寫入| C[MongoDB]
     B -->|發送事件| D[Kafka]
     D -->|消費事件| E[活動模組（Kafka Consumer）]
@@ -27,8 +27,8 @@ flowchart TD
 ```mermaid
 sequenceDiagram
     participant Player as 玩家
-    participant Table as TableServer
-    participant Record as GameRecordServer
+    participant Table as table_server
+    participant Record as game_record_server
     participant Mongo as MongoDB
     participant Kafka as Kafka
     participant Activity as 活動模組 (Kafka Consumer)

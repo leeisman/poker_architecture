@@ -6,9 +6,9 @@
 
 ## 🎯 架構設計重點
 
-- 所有狀態由 `TableServer` 控制並具有內部狀態機
-- 路由與服務發現交由 `GameRouter` 管理
-- 資料寫入經由 `GameRecordService` 統一處理，避免 TableServer 操作資料庫造成 I/O 過重
+- 所有狀態由 `table_server` 控制並具有內部狀態機
+- 路由與服務發現交由 `game_router` 管理
+- 資料寫入經由 `game_record_server` 統一處理，避免 table_server 操作資料庫造成 I/O 過重
 
 ---
 
@@ -19,9 +19,9 @@ sequenceDiagram
     participant Client1 as 玩家 A
     participant Client2 as 玩家 B
     participant Gateway as Game Gateway
-    participant Router as GameRouter<br/>(查找 table instance)
-    participant Table as TableServer（狀態機）
-    participant Record as GameRecordService
+    participant Router as game_router<br/>(查找 table instance)
+    participant Table as table_server
+    participant Record as game_record_server
     participant Mongo as MongoDB
 
     %% 玩家 A、B All-In 發起請求
@@ -32,11 +32,11 @@ sequenceDiagram
     Gateway->>Router: Forward iBetREQ (A)
     Gateway->>Router: Forward iBetREQ (B)
 
-    %% Router 查表位，找到 TableServer 實體，直接轉發
+    %% Router 查表位，找到 table_server 實體，直接轉發
     Router->>Table: iBetREQ (A)
     Router->>Table: iBetREQ (B)
 
-    %% TableServer 成功處理，直接回應 Gateway
+    %% table_server 成功處理，直接回應 Gateway
     Table-->>Gateway: BetRSP (A)
     Table-->>Gateway: BetRSP (B)
     Gateway-->>Client1: BetRSP
