@@ -1,0 +1,52 @@
+# Mongo Overview
+# MongoDB Staff Engineer 文件總覽
+
+這份文件彙整了 Staff Engineer 級別面試中常見的 MongoDB 核心主題，涵蓋從架構、分片、索引、交易、效能到實戰設計題的所有必備知識點。
+
+## 文件目錄與說明
+
+### 1. `Mongo_Overview.md`
+MongoDB 的整體架構與核心概念，包括 BSON、Replica Set、Sharding、資料模型與存儲引擎（WiredTiger）。
+
+### 2. `Replica_Set_and_Failover.md`
+深入剖析主從複製機制、Oplog 同步、Primary 選舉與自動故障轉移行為。
+
+### 3. `Sharding_and_Distribution.md`
+了解分片架構的設計原理，包含 hash/range 分片、chunk balancing、mongos 路由與跨分片操作的限制。
+
+### 4. `ReadWrite_Concern.md`
+解釋 readConcern / writeConcern / readPreference 各模式與場景適用性，以及其對一致性與可用性的影響。
+
+### 5. `Indexing_and_Query.md`
+整理常見索引類型（單欄、複合、部分、TTL）、查詢優化策略、使用 explain 分析 query plan。
+
+### 6. `Aggregation_Pipeline.md`
+詳細介紹 MongoDB 的資料處理管線（aggregation pipeline）運作與常見 operator 使用模式，例如 `$lookup`、`$facet`、`$group`。
+
+### 7. `Transactions_and_Consistency.md`
+解釋多文件交易的支援條件、一致性與原子性處理策略，以及在 sharded cluster 中的交易限制。
+
+### 8. `Schema_Design_and_Modeling.md`
+探討 embedding vs referencing 的 schema 選擇策略、document 大小限制（16MB）、schema migration 實務。
+
+### 9. `Performance_and_Tuning.md`
+整理效能優化方法，包括 query 優化、I/O 分析、WiredTiger cache 管理與併發限制。
+
+### 10. `Monitoring_and_Profiling.md`
+介紹 profiler、slowlog、監控指標（如 replication lag、connections、memory）與排查問題技巧。
+
+### 11. `Retry_Strategy_and_Error.md`
+解析常見錯誤碼（WriteConflict、StaleShardVersion）、retryable write 設計與錯誤補償機制。
+
+### 12. `Mongo_vs_SQL_Comparison.md`
+對比 MongoDB 與傳統 RDBMS（如 MySQL/PostgreSQL）的 schema 設計、查詢語言、擴充性與一致性策略差異。
+
+### 13. `Mongo_Design_Questions.md`
+收錄常見系統設計題與解題建議，例如聊天系統、time series、multi-tenant 架構、即時事件寫入設計等。
+
+---
+
+**建議學習順序**：  
+`Mongo_Overview.md → Replica_Set_and_Failover.md → Indexing_and_Query.md → Aggregation_Pipeline.md → Sharding_and_Distribution.md → Transactions_and_Consistency.md → 其餘章節`
+
+如需更多實作樣例或設計圖，請搭配實戰場景進行模擬。
