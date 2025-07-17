@@ -96,3 +96,105 @@ if ok {
 ---
 
 > 📌 小提醒：slice 和 map 都是「引用型別」，傳遞時會共用底層資料，使用時要特別注意修改行為與記憶體使用。
+
+---
+
+## 實作 Timeout機制
+```go
+package base
+
+import (
+	"context"
+	"sync"
+	"time"
+
+	"github.com/golang/glog"
+)
+
+// TimeoutMessage 自定义消息类型
+type timeoutMessage struct {
+	F     func(ctx context.Context)
+	Event string
+}
+
+type timeout struct {
+	t    *time.Timer
+	once sync.Once
+}
+
+// when multiple timers end at the same time, the order for this timers are not guarenteed
+func (o *Base) SetTimeout(e string, milliseconds int64, f func(context.Context)) int64 {
+	o.timeoutsMux.Lock()
+	defer o.timeoutsMux.Unlock()
+
+	o.lastTimeoutId++
+	for {
+		if _, ok := o.timeouts[o.lastTimeoutId]; ok {
+			o.lastTimeoutId++
+		} else {
+			break
+		}
+	}
+
+	id := o.lastTimeoutId
+	switch milliseconds {
+	case 0:
+		// sent to actor instantly
+		o.sendTimeoutToActor(e, f)
+	default:
+		o.timeouts[id] = &timeout{
+			once: sync.Once{},
+			t: time.AfterFunc(time.Duration(milliseconds)*time.Millisecond, func() {
+				o.timeoutsMux.Lock()
+				defer o.timeoutsMux.Unlock()
+
+				if _, ok := o.timeouts[id]; !ok {
+					return
+				}
+
+				o.timeouts[id].once.Do(func() { o.sendTimeoutToActor(e, f) })
+				delete(o.timeouts, id)
+			}),
+		}
+	}
+
+	return id
+}
+
+func (o *Base) ResetTimeout(id, milliseconds int64) {
+	o.timeoutsMux.Lock()
+	defer o.timeoutsMux.Unlock()
+
+	if _, ok := o.timeouts[id]; !ok {
+		return
+	}
+	switch milliseconds {
+	case 0:
+		// stop timer
+		o.timeouts[id].t.Stop()
+		delete(o.timeouts, id)
+	default:
+		// set the remaining delay duration
+		o.timeouts[id].t.Reset(time.Duration(milliseconds) * time.Millisecond)
+	}
+}
+
+func (o *Base) sendTimeoutToActor(e string, f func(context.Context)) {
+	ctx := o.grpcServer.CreateContextV2("")
+	o.SendActorMsg(ctx, &timeoutMessage{
+		F:     f,
+		Event: e,
+	}, 0)
+}
+
+func (o *Base) closeTimeout() {
+	o.timeoutsMux.Lock()
+	defer o.timeoutsMux.Unlock()
+	glog.Infof("stop timeout: %d", len(o.timeouts))
+
+	for _, t := range o.timeouts {
+		t.t.Stop()
+	}
+	o.timeouts = nil
+}
+```

@@ -126,3 +126,56 @@ pprof.Lookup("goroutine").WriteTo(os.Stdout, 1) // 輸出堆疊資訊
 ```
 
 > 📌 Golang 的並發核心哲學：「不要用共享記憶體來通訊，而要用通訊來共享記憶體」。
+
+---
+
+## 🧩 or‑tree Pattern 摘要
+
+https://www.linkedin.com/pulse/combine-or-channel-patterns-like-go-expert-advanced-archit-agarwal-w0b9c/
+文章中提出的高效 or() 實作採用「分治」 (divide-and-conquer) 的方式，以遞迴方式兩兩合併 channel，稱為 or‑tree pattern。這種結構能大幅減少 goroutine 數量與資源消耗，更適合多 channel 情境。
+
+```go
+func or(channels ...<-chan struct{}) <-chan struct{} {
+    switch len(channels) {
+    case 0:
+        return nil
+    case 1:
+        return channels[0]
+    case 2:
+        out := make(chan struct{})
+        go func() {
+            select {
+            case <-channels[0]:
+            case <-channels[1]:
+            }
+            close(out)
+        }()
+        return out
+    default:
+        mid := len(channels) / 2
+        left := or(channels[:mid]...)
+        right := or(channels[mid:]...)
+        return or(left, right)
+    }
+}
+```
+
+```mermaid
+sequenceDiagram
+  participant P1 as Player1
+  participant P2 as Player2
+  participant P3 as Player3
+  participant GS as GameServer
+  participant T as Timeout
+
+  GS->>P1: waitForActions(3,15s)
+  GS->>P2: waitForActions
+  GS->>P3: waitForActions
+  GS->>T: start timeout timer
+
+  Note over GS,P1: or-tree pattern waiting...
+
+  P2-->>GS: Player2 acted (after 5s)
+  GS-->>T: cancel timeout (implicitly by or)
+  GS-->>All: proceed to next step
+```
